@@ -5,6 +5,10 @@ class ProduitRepository extends BaseRepository {
     super('produit');
   }
 
+  findByLibelle(libelle, tx) {
+    return this.getModel(tx).findUnique({ where: { libelle } });
+  }
+
   updateStock(id, nextStock, tx) {
     return this.getModel(tx).update({
       where: { id: Number(id) },

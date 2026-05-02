@@ -7,6 +7,9 @@ const ErrorMessages = require('../enums/error-messages.enum');
 
 class ProduitService {
   async create(data, file) {
+    const existing = await produitRepository.findByLibelle(data.libelle);
+    if (existing) throw new ApiError(HttpStatus.CONFLICT, 'Libelle produit deja utilise');
+
     const imageUrl = await cloudinaryService.uploadImage(file && file.buffer);
     const payload = {
       ...data,
@@ -33,6 +36,13 @@ class ProduitService {
     const payload = { ...data };
     if (payload.quantiteStock !== undefined) payload.quantiteStock = Number(payload.quantiteStock);
     if (payload.prixUnitaire !== undefined) payload.prixUnitaire = Number(payload.prixUnitaire);
+
+    if (payload.libelle) {
+      const existing = await produitRepository.findByLibelle(payload.libelle);
+      if (existing && existing.id !== Number(id)) {
+        throw new ApiError(HttpStatus.CONFLICT, 'Libelle produit deja utilise');
+      }
+    }
 
     const updated = await produitRepository.update(id, payload);
     if (!updated) throw new ApiError(HttpStatus.NOT_FOUND, ErrorMessages.PRODUIT_NON_TROUVE);

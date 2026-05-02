@@ -21,7 +21,7 @@ model User {
 model Fournisseur {
   id                Int               @id @default(autoincrement())
   nom               String
-  telephone         String
+  telephone         String            @unique
   adresse           String
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
@@ -32,7 +32,7 @@ model Fournisseur {
 
 model Produit {
   id                Int               @id @default(autoincrement())
-  libelle           String
+  libelle           String            @unique
   prixUnitaire      Decimal           @db.Decimal(10, 2)
   quantiteStock     Int               @default(0)
   imageUrl          String

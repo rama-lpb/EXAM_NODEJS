@@ -4,7 +4,9 @@ const HttpStatus = require('../enums/http-status.enum');
 const ErrorMessages = require('../enums/error-messages.enum');
 
 class FournisseurService {
-  create(data) {
+  async create(data) {
+    const existing = await fournisseurRepository.findByTelephone(data.telephone);
+    if (existing) throw new ApiError(HttpStatus.CONFLICT, 'Telephone fournisseur deja utilise');
     return fournisseurRepository.create(data);
   }
 
@@ -19,6 +21,12 @@ class FournisseurService {
   }
 
   async update(id, data) {
+    if (data.telephone) {
+      const existing = await fournisseurRepository.findByTelephone(data.telephone);
+      if (existing && existing.id !== Number(id)) {
+        throw new ApiError(HttpStatus.CONFLICT, 'Telephone fournisseur deja utilise');
+      }
+    }
     const updated = await fournisseurRepository.update(id, data);
     if (!updated) throw new ApiError(HttpStatus.NOT_FOUND, ErrorMessages.FOURNISSEUR_NON_TROUVE);
     return updated;
